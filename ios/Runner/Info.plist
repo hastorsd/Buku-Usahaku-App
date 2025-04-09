@@ -45,5 +45,26 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Google Sign-in Section -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- TODO Replace this value: -->
+				<!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
+				<string>com.googleusercontent.apps.298878042296-pallucmh5osjphr0f0oc88udlgr4rt0t</string>
+			</array>
+		</dict>
+	</array>
+	<!-- End of the Google Sign-in Section -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to upload images.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your camera to take photos.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need access to your microphone to record audio.</string>
 </dict>
 </plist>

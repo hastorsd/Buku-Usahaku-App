@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "847410242176",
+    "project_id": "thesis-dd3d3",
+    "storage_bucket": "thesis-dd3d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847410242176:android:5e87780a0f1e08687a7c65",
+        "android_client_info": {
+          "package_name": "com.hastorsd.thesis_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLX8wS1OVs-t-QXT65zaVvnUonPpJQoFw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
