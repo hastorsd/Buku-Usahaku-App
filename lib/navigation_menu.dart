@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:thesis_app/screens/info_page.dart';
 import 'package:thesis_app/screens/pesanan_page.dart';
 import 'package:thesis_app/screens/produk/produk_page.dart';
 import 'package:thesis_app/screens/recap_page.dart';
-import 'dart:ui';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
@@ -15,64 +13,74 @@ class NavigationMenu extends StatelessWidget {
     final controller = Get.put(NavigationController());
 
     return Scaffold(
-      bottomNavigationBar: Obx(() => ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+      bottomNavigationBar: Obx(() {
+        final currentIndex = controller.selectedIndex.value;
+        final navItemCount = 4;
+        final itemWidth = MediaQuery.of(context).size.width / navItemCount;
+
+        return Stack(
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
               child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.6),
-                  border: const Border(
-                    top: BorderSide(color: Colors.black12),
-                  ),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  border: Border(top: BorderSide(color: Colors.black12)),
                 ),
-                child: SalomonBottomBar(
-                  backgroundColor: Colors.transparent,
-                  currentIndex: controller.selectedIndex.value,
-                  onTap: (index) => controller.selectedIndex.value = index,
-                  items: [
-                    SalomonBottomBarItem(
-                      icon: Icon(
-                        controller.selectedIndex.value == 0
-                            ? Icons.shopping_bag
-                            : Icons.shopping_bag_outlined,
-                      ),
-                      title: const Text("Produk"),
-                      selectedColor: Colors.purple,
-                    ),
-                    SalomonBottomBarItem(
-                      icon: Icon(
-                        controller.selectedIndex.value == 1
-                            ? Icons.receipt_long
-                            : Icons.receipt_long_outlined,
-                      ),
-                      title: const Text("Pesanan"),
-                      selectedColor: Colors.blue,
-                    ),
-                    SalomonBottomBarItem(
-                      icon: Icon(
-                        controller.selectedIndex.value == 2
-                            ? Icons.attach_money
-                            : Icons.money_outlined,
-                      ),
-                      title: const Text("Rekap"),
-                      selectedColor: Colors.green,
-                    ),
-                    SalomonBottomBarItem(
-                      icon: Icon(
-                        controller.selectedIndex.value == 3
-                            ? Icons.info
-                            : Icons.info_outline,
-                      ),
-                      title: const Text("Info"),
-                      selectedColor: Colors.orange,
-                    ),
-                  ],
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                  ),
+                  child: BottomNavigationBar(
+                    currentIndex: currentIndex,
+                    onTap: (index) => controller.selectedIndex.value = index,
+                    type: BottomNavigationBarType.fixed,
+                    selectedItemColor: const Color(0xFF007AFF),
+                    unselectedItemColor: Colors.black,
+                    showUnselectedLabels: true,
+                    backgroundColor: Colors.white,
+                    items: [
+                      _buildNavItem(Icons.shopping_bag, "Produk"),
+                      _buildNavItem(Icons.receipt_long, "Pesanan"),
+                      _buildNavItem(Icons.attach_money, "Rekap"),
+                      _buildNavItem(Icons.info, "Info"),
+                    ],
+                  ),
                 ),
               ),
             ),
-          )),
+            // ✅ Garis aktif animasi
+            Positioned(
+              width: MediaQuery.of(context).size.width,
+              child: AnimatedAlign(
+                duration: const Duration(milliseconds: 300),
+                alignment: Alignment(
+                    (currentIndex * 2 / (navItemCount - 1)) - 1,
+                    0), // dari -1 ke 1
+                child: Container(
+                  width: itemWidth * 0.5,
+                  height: 3,
+                  margin: EdgeInsets.symmetric(horizontal: itemWidth * 0.25),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF007AFF),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
       body: Obx(() => controller.screens[controller.selectedIndex.value]),
+    );
+  }
+
+  BottomNavigationBarItem _buildNavItem(IconData icon, String label) {
+    return BottomNavigationBarItem(
+      icon: Icon(icon),
+      label: label,
     );
   }
 }

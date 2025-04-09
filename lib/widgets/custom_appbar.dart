@@ -35,7 +35,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
     return AppBar(
       title: Text(widget.titleOverride ?? getGreeting()),
       leading: PopupMenuButton<String>(
-        icon: const Icon(Icons.menu),
+        icon: const Icon(Icons.menu, color: Colors.blue),
         onSelected: (String result) async {
           if (result == 'logout') {
             await authService.signOut();
