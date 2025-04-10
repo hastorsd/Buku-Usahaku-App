@@ -47,29 +47,21 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
 
   XFile? _selectedImage;
   bool _isLoading = false;
-
   final picker = ImagePicker();
 
   Future<void> _submitProduk() async {
     if (_namaController.text.isEmpty || _jualController.text.isEmpty) {
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text(
-            'Peringatan!',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
-          ),
-          content: const Text('Nama produk dan harga wajib diisi!'),
+        builder: (context) => const AlertDialog(
+          title: Text('Peringatan!',
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text('Nama produk dan harga wajib diisi!'),
         ),
       );
 
       Future.delayed(const Duration(seconds: 2), () {
-        if (Navigator.canPop(context)) {
-          Navigator.of(context).pop();
-        }
+        if (Navigator.canPop(context)) Navigator.of(context).pop();
       });
 
       return;

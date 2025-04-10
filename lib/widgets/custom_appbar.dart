@@ -38,7 +38,25 @@ class _CustomAppBarState extends State<CustomAppBar> {
         icon: const Icon(Icons.menu, color: Colors.blue),
         onSelected: (String result) async {
           if (result == 'logout') {
-            await authService.signOut();
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                      title: const Text('Konfirmasi Logout'),
+                      content: const Text('Apakah Anda yakin ingin keluar?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('Batal'),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        TextButton(
+                          child: const Text('Logout'),
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            await authService.signOut();
+                          },
+                        ),
+                      ],
+                    ));
           }
         },
         itemBuilder: (BuildContext context) => const <PopupMenuEntry<String>>[

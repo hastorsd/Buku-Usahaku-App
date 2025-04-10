@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:thesis_app/auth/auth_service.dart';
 import 'package:thesis_app/database/produk_database.dart';
 import 'package:thesis_app/model/produk.dart';
+import 'package:thesis_app/screens/produk/detail_produk_page.dart';
 import 'package:thesis_app/screens/produk/tambah_produk.dart';
 import 'package:thesis_app/widgets/custom_appbar.dart';
 
@@ -72,44 +73,54 @@ class _ProdukPageState extends State<ProdukPage> {
                   itemCount: produks.length,
                   itemBuilder: (context, index) {
                     final produk = produks[index];
-                    return Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            produk.gambar_url != null &&
-                                    produk.gambar_url!.isNotEmpty
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      produk.gambar_url!,
-                                      height: 80,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : const Icon(Icons.image,
-                                    size: 80, color: Colors.grey),
-                            const SizedBox(height: 8),
-                            Text(
-                              produk.nama_produk,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
-                            ),
-                            Text(
-                                'Rp ${currencyFormatter.format(produk.harga_jual)}'),
-                            Text(
-                                'Rp ${currencyFormatter.format(produk.harga_modal)}'),
-                            Text(produk.deskripsi_produk,
-                                maxLines: 2, overflow: TextOverflow.ellipsis),
-                            Text(produk.tambahan_produk,
-                                style: const TextStyle(fontSize: 11)),
-                          ],
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => DetailProdukPage(produk: produk),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              produk.gambar_url != null &&
+                                      produk.gambar_url!.isNotEmpty
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        produk.gambar_url!,
+                                        height: 80,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : const Icon(Icons.image,
+                                      size: 80, color: Colors.grey),
+                              const SizedBox(height: 8),
+                              Text(
+                                produk.nama_produk,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                  'Rp ${currencyFormatter.format(produk.harga_jual)}'),
+                              Text(
+                                  'Rp ${currencyFormatter.format(produk.harga_modal)}'),
+                              Text(produk.deskripsi_produk,
+                                  maxLines: 2, overflow: TextOverflow.ellipsis),
+                              Text(produk.tambahan_produk,
+                                  style: const TextStyle(fontSize: 11)),
+                            ],
+                          ),
                         ),
                       ),
                     );
