@@ -83,44 +83,61 @@ class _ProdukPageState extends State<ProdukPage> {
                         );
                       },
                       child: Card(
-                        elevation: 3,
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              produk.gambar_url != null &&
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: produk.gambar_url != null &&
                                       produk.gambar_url!.isNotEmpty
                                   ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: const BorderRadius.vertical(
+                                          top: Radius.circular(12)),
                                       child: Image.network(
                                         produk.gambar_url!,
-                                        height: 80,
                                         width: double.infinity,
                                         fit: BoxFit.cover,
                                       ),
                                     )
-                                  : const Icon(Icons.image,
-                                      size: 80, color: Colors.grey),
-                              const SizedBox(height: 8),
-                              Text(
-                                produk.nama_produk,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center,
+                                  : Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                                top: Radius.circular(12)),
+                                      ),
+                                      child: const Center(
+                                        child: Text('tidak ada gambar'),
+                                      ),
+                                    ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    produk.nama_produk,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Rp ${currencyFormatter.format(produk.harga_jual)}',
+                                    style: const TextStyle(
+                                      color: Color(0xFF007AFF),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                  'Rp ${currencyFormatter.format(produk.harga_jual)}'),
-                              Text(
-                                  'Rp ${currencyFormatter.format(produk.harga_modal)}'),
-                              Text(produk.deskripsi_produk,
-                                  maxLines: 2, overflow: TextOverflow.ellipsis),
-                              Text(produk.tambahan_produk,
-                                  style: const TextStyle(fontSize: 11)),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     );
