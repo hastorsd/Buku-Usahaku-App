@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:thesis_app/auth/auth_gate.dart';
 
@@ -8,6 +9,7 @@ const supabaseKey =
 
 Future<void> main() async {
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+  await initializeDateFormatting('id_ID', '');
   runApp(MyApp());
 }
 
@@ -20,8 +22,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Aplikasi Skripsi',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: ColorScheme.light(),
       ),
       home: AuthGate(),
     );

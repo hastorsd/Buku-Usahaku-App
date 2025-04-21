@@ -32,11 +32,17 @@ class _ProdukPageState extends State<ProdukPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: tambahProdukBaru,
         backgroundColor: const Color(0xFF007AFF),
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add, color: Colors.white),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text(
+          'Tambah Produk',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

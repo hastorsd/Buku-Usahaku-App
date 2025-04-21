@@ -35,7 +35,6 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   get:
-  intl:
   supabase_flutter: ^2.8.4
   google_sign_in: ^6.3.0
   awesome_snackbar_content: ^0.1.5
@@ -47,6 +46,8 @@ dependencies:
   path:
   cached_network_image:
   salomon_bottom_bar:
+  intl: 
+  font_awesome_flutter:
 
 dev_dependencies:
   flutter_test:

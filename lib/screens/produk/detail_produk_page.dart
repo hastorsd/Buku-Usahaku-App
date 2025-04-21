@@ -35,11 +35,14 @@ class DetailProdukPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: produk.gambar_url != null && produk.gambar_url!.isNotEmpty
-                  ? Image.network(produk.gambar_url!)
-                  : const Icon(Icons.image, size: 150, color: Colors.grey),
+            Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: produk.gambar_url != null &&
+                        produk.gambar_url!.isNotEmpty
+                    ? Image.network(produk.gambar_url!)
+                    : const Icon(Icons.image, size: 150, color: Colors.grey),
+              ),
             ),
             const SizedBox(height: 16),
             Row(

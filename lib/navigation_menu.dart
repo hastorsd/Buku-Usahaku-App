@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:thesis_app/screens/info_page.dart';
-import 'package:thesis_app/screens/pesanan_page.dart';
+import 'package:thesis_app/screens/pesanan/pesanan_page.dart';
 import 'package:thesis_app/screens/produk/produk_page.dart';
 import 'package:thesis_app/screens/recap_page.dart';
 
@@ -90,7 +90,7 @@ class NavigationController extends GetxController {
 
   final screens = [
     const ProdukPage(),
-    const PesananPage(),
+    PesananPage(),
     const RecapPage(),
     const InfoPage(),
   ];

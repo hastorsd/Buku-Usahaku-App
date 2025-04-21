@@ -32,8 +32,10 @@ class ProdukDatabase {
 
   // Create
   Future createProduk(Produk tambahProduk) async {
-    final userId = database.auth.currentUser!.id; // ⬅️ ambil user login
-    final data = tambahProduk.toMap()..['user_id'] = userId;
+    final userId = database.auth.currentUser!.id; // ambil user login
+    final data = tambahProduk.toMap()
+      ..['user_id'] = userId; // pakai .. biar menyingkat
+    /* sama aja kaya data['user_id'] = userId; */
     await database.from('produk').insert(data);
   }
 
@@ -42,7 +44,7 @@ class ProdukDatabase {
       .from('produk')
       .stream(primaryKey: ['id'])
       .eq('user_id',
-          Supabase.instance.client.auth.currentUser!.id) // ⬅️ filter user
+          Supabase.instance.client.auth.currentUser!.id) // filter user
       .map((data) =>
           data.map((produkMap) => Produk.fromMap(produkMap)).toList());
 
