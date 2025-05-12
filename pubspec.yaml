@@ -47,7 +47,7 @@ dependencies:
   cached_network_image:
   salomon_bottom_bar:
   intl: 
-  font_awesome_flutter:
+  font_awesome_flutter: ^10.7.0
 
 dev_dependencies:
   flutter_test:

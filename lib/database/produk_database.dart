@@ -49,25 +49,26 @@ class ProdukDatabase {
           data.map((produkMap) => Produk.fromMap(produkMap)).toList());
 
   // Update
-  Future updateProduk(
-    Produk produkLama,
-    String namaProdukBaru,
-    double hargaJualBaru,
-    double hargaModalBaru,
-    String deskripsiProdukBaru,
-    String tambahanProdukBaru,
-  ) async {
-    await database.from('produk').update({
-      'nama_produk': namaProdukBaru,
-      'harga_jual': hargaJualBaru,
-      'harga_modal': hargaModalBaru,
-      'deskripsi_produk': deskripsiProdukBaru,
-      'tambahan_produk': tambahanProdukBaru,
-    }).eq('id', produkLama.id!);
+  Future updateProduk(String id, Map<String, dynamic> data) async {
+    await database.from('produk').update(data).eq('id', id);
   }
 
   // Delete
   Future deleteProduk(Produk produk) async {
     await database.from('produk').delete().eq('id', produk.id!);
+  }
+
+  // Get produk by id (untuk tampilin produk di halaman detail pesanan)
+  Future<Produk?> getProdukById(int id) async {
+    final result = await Supabase.instance.client
+        .from('produk')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
+
+    if (result != null) {
+      return Produk.fromMap(result);
+    }
+    return null;
   }
 }

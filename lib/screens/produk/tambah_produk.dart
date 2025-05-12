@@ -31,8 +31,10 @@ double parseHarga(String hargaFormatted) {
 
 class TambahProdukPage extends StatefulWidget {
   final ProdukDatabase produkDatabase;
+  final Produk? produk;
 
-  const TambahProdukPage({super.key, required this.produkDatabase});
+  const TambahProdukPage(
+      {super.key, required this.produkDatabase, this.produk});
 
   @override
   State<TambahProdukPage> createState() => _TambahProdukPageState();
@@ -48,6 +50,22 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
   XFile? _selectedImage;
   bool _isLoading = false;
   final picker = ImagePicker();
+  String? _imageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.produk != null) {
+      _namaController.text = widget.produk!.nama_produk;
+      _jualController.text =
+          currencyFormatter.format(widget.produk!.harga_jual.toInt());
+      _modalController.text =
+          currencyFormatter.format(widget.produk!.harga_modal.toInt());
+      _deskripsiController.text = widget.produk!.deskripsi_produk ?? '';
+      _tambahanController.text = widget.produk!.tambahan_produk ?? '';
+      _imageUrl = widget.produk!.gambar_url;
+    }
+  }
 
   Future<void> _submitProduk() async {
     if (_namaController.text.isEmpty || _jualController.text.isEmpty) {
@@ -69,7 +87,7 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
 
     setState(() => _isLoading = true);
 
-    String? imageUrl;
+    String? imageUrl = _imageUrl;
     if (_selectedImage != null) {
       final bytes = await File(_selectedImage!.path).readAsBytes();
       imageUrl =
@@ -77,22 +95,38 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
     }
 
     final userId = Supabase.instance.client.auth.currentUser!.id;
-    final produk = Produk(
-      user_id: userId,
-      nama_produk: _namaController.text,
-      harga_jual: parseHarga(_jualController.text),
-      harga_modal: parseHarga(_modalController.text),
-      deskripsi_produk: _deskripsiController.text,
-      tambahan_produk: _tambahanController.text,
-      gambar_url: imageUrl ?? '',
-    );
 
-    await widget.produkDatabase.createProduk(produk);
-    Navigator.pop(context);
+    if (widget.produk != null) {
+      // UPDATE
+      await widget.produkDatabase.updateProduk(widget.produk!.id.toString(), {
+        'user_id': userId,
+        'nama_produk': _namaController.text,
+        'harga_jual': parseHarga(_jualController.text),
+        'harga_modal': parseHarga(_modalController.text),
+        'deskripsi_produk': _deskripsiController.text,
+        'tambahan_produk': _tambahanController.text,
+        'gambar_url': imageUrl ?? '',
+      });
+    } else {
+      // INSERT BARU
+      final produk = Produk(
+        user_id: userId,
+        nama_produk: _namaController.text,
+        harga_jual: parseHarga(_jualController.text),
+        harga_modal: parseHarga(_modalController.text),
+        deskripsi_produk: _deskripsiController.text,
+        tambahan_produk: _tambahanController.text,
+        gambar_url: imageUrl ?? '',
+      );
+      await widget.produkDatabase.createProduk(produk);
+    }
+
+    if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isEdit = widget.produk != null;
     return Padding(
       padding: EdgeInsets.only(
         top: 24,
@@ -103,8 +137,9 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            const Text('Tambah Produk',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(isEdit ? 'Edit Produk' : 'Tambah Produk',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             GestureDetector(
               onTap: () async {
@@ -121,14 +156,19 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
                   color: const Color.fromARGB(255, 225, 225, 225),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: _selectedImage == null
-                    ? const Center(
-                        child: Icon(Icons.camera_alt, color: Colors.grey))
-                    : ClipRRect(
+                child: _selectedImage != null
+                    ? ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.file(File(_selectedImage!.path),
                             fit: BoxFit.cover),
-                      ),
+                      )
+                    : (_imageUrl != null && _imageUrl!.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(_imageUrl!, fit: BoxFit.cover),
+                          )
+                        : const Center(
+                            child: Icon(Icons.camera_alt, color: Colors.grey))),
               ),
             ),
             const SizedBox(height: 16),
@@ -155,8 +195,8 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Tambah Produk',
-                        style: TextStyle(color: Colors.white)),
+                    : Text(isEdit ? 'Simpan Perubahan' : 'Tambah Produk',
+                        style: const TextStyle(color: Colors.white)),
               ),
             ),
             const SizedBox(height: 20),

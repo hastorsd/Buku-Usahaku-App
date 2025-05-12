@@ -1,11 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // import untuk format angka
+import 'package:intl/intl.dart';
 import 'package:thesis_app/model/produk.dart';
+import 'package:thesis_app/database/produk_database.dart';
+import 'package:thesis_app/screens/produk/tambah_produk.dart';
 
-class DetailProdukPage extends StatelessWidget {
+class DetailProdukPage extends StatefulWidget {
   final Produk produk;
 
-  const DetailProdukPage({super.key, required this.produk});
+  DetailProdukPage({super.key, required this.produk});
+
+  @override
+  State<DetailProdukPage> createState() => _DetailProdukPageState();
+}
+
+class _DetailProdukPageState extends State<DetailProdukPage> {
+  final ProdukDatabase produkDatabase = ProdukDatabase();
+
+  void _editProduk(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => TambahProdukPage(
+        produkDatabase: produkDatabase,
+        produk: widget.produk,
+      ),
+    );
+  }
+
+  void _deleteProduk(BuildContext context) async {
+    final konfirmasi = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Hapus Produk'),
+        content: const Text('Apakah kamu yakin ingin menghapus produk ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+
+    if (konfirmasi == true) {
+      await produkDatabase.deleteProduk(widget.produk);
+      if (context.mounted) {
+        Navigator.pop(context); // keluar dari halaman detail
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Produk berhasil dihapus')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +69,12 @@ class DetailProdukPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () {
-              // TODO: navigasi ke halaman edit
-            },
-          )
+            onPressed: () => _editProduk(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () => _deleteProduk(context),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -28,7 +83,7 @@ class DetailProdukPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              produk.nama_produk,
+              widget.produk.nama_produk,
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -38,9 +93,9 @@ class DetailProdukPage extends StatelessWidget {
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: produk.gambar_url != null &&
-                        produk.gambar_url!.isNotEmpty
-                    ? Image.network(produk.gambar_url!)
+                child: widget.produk.gambar_url != null &&
+                        widget.produk.gambar_url!.isNotEmpty
+                    ? Image.network(widget.produk.gambar_url!)
                     : const Icon(Icons.image, size: 150, color: Colors.grey),
               ),
             ),
@@ -48,16 +103,10 @@ class DetailProdukPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildPriceItem(
-                  "Harga Jual",
-                  produk.harga_jual.toInt(),
-                  Colors.blue,
-                ),
-                _buildPriceItem(
-                  "Harga Modal",
-                  produk.harga_modal.toInt(),
-                  Colors.green,
-                ),
+                _buildPriceItem("Harga Jual", widget.produk.harga_jual.toInt(),
+                    Colors.blue),
+                _buildPriceItem("Harga Modal",
+                    widget.produk.harga_modal.toInt(), Colors.green),
               ],
             ),
             const SizedBox(height: 16),
@@ -71,8 +120,8 @@ class DetailProdukPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                (produk.deskripsi_produk?.isNotEmpty ?? false)
-                    ? produk.deskripsi_produk!
+                (widget.produk.deskripsi_produk?.isNotEmpty ?? false)
+                    ? widget.produk.deskripsi_produk!
                     : 'Tidak ada deskripsi',
                 style: const TextStyle(fontSize: 14),
               ),
@@ -88,8 +137,8 @@ class DetailProdukPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                (produk.tambahan_produk?.isNotEmpty ?? false)
-                    ? produk.tambahan_produk!
+                (widget.produk.tambahan_produk?.isNotEmpty ?? false)
+                    ? widget.produk.tambahan_produk!
                     : 'Tidak ada tambahan',
                 style: const TextStyle(fontSize: 14),
               ),

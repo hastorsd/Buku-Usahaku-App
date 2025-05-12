@@ -23,7 +23,10 @@ class MyApp extends StatelessWidget {
       title: 'Aplikasi Skripsi',
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
-        colorScheme: ColorScheme.light(),
+        colorScheme: const ColorScheme.light(
+          primary: Colors.blue, // ganti dari ungu jadi biru
+          secondary: Colors.blueAccent,
+        ),
       ),
       home: AuthGate(),
     );

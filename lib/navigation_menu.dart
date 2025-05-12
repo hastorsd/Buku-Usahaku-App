@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:thesis_app/screens/info_page.dart';
+import 'package:thesis_app/screens/info/info_page.dart';
 import 'package:thesis_app/screens/pesanan/pesanan_page.dart';
 import 'package:thesis_app/screens/produk/produk_page.dart';
-import 'package:thesis_app/screens/recap_page.dart';
+import 'package:thesis_app/screens/recap/recap_page.dart';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
@@ -45,7 +45,7 @@ class NavigationMenu extends StatelessWidget {
                       _buildNavItem(Icons.shopping_bag, "Produk"),
                       _buildNavItem(Icons.receipt_long, "Pesanan"),
                       _buildNavItem(Icons.attach_money, "Rekap"),
-                      _buildNavItem(Icons.info, "Info"),
+                      _buildNavItem(Icons.notes, "Catatan"),
                     ],
                   ),
                 ),
