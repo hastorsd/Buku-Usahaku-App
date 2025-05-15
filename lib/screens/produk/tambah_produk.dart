@@ -117,6 +117,7 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
         deskripsi_produk: _deskripsiController.text,
         tambahan_produk: _tambahanController.text,
         gambar_url: imageUrl ?? '',
+        isDeleted: false,
       );
       await widget.produkDatabase.createProduk(produk);
     }

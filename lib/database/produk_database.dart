@@ -40,22 +40,39 @@ class ProdukDatabase {
   }
 
   // Read hanya produk milik user
+  // final stream = Supabase.instance.client
+  //     .from('produk')
+  //     .stream(primaryKey: ['id'])
+  //     .eq('user_id',
+  //         Supabase.instance.client.auth.currentUser!.id) // filter user
+  //     .map((data) =>
+  //         data.map((produkMap) => Produk.fromMap(produkMap)).toList());
+
+  // Read produk yang belum dihapus
   final stream = Supabase.instance.client
       .from('produk')
       .stream(primaryKey: ['id'])
-      .eq('user_id',
-          Supabase.instance.client.auth.currentUser!.id) // filter user
-      .map((data) =>
-          data.map((produkMap) => Produk.fromMap(produkMap)).toList());
+      .eq('user_id', Supabase.instance.client.auth.currentUser!.id)
+      .map((data) => data
+          .where((record) => record['is_deleted'] == false) // Filter aktif
+          .map((produkMap) => Produk.fromMap(produkMap))
+          .toList());
 
   // Update
   Future updateProduk(String id, Map<String, dynamic> data) async {
     await database.from('produk').update(data).eq('id', id);
   }
 
-  // Delete
+  // Hard Delete
+  // Future deleteProduk(Produk produk) async {
+  //   await database.from('produk').delete().eq('id', produk.id!);
+  // }
+
+  // Soft delete
   Future deleteProduk(Produk produk) async {
-    await database.from('produk').delete().eq('id', produk.id!);
+    await database
+        .from('produk')
+        .update({'is_deleted': true}).eq('id', produk.id!);
   }
 
   // Get produk by id (untuk tampilin produk di halaman detail pesanan)

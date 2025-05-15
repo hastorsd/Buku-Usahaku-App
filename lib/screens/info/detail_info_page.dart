@@ -55,6 +55,31 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
     return DateFormat("d MMMM yyyy", 'id_ID').format(tanggal);
   }
 
+  void _konfirmasiHapus() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Catatan'),
+        content: const Text('Yakin ingin menghapus catatan ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await InfoDatabase().deleteInfo(widget.info.id!);
+      if (mounted) Navigator.of(context).pop(); // Kembali ke halaman sebelumnya
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,11 +97,16 @@ class _DetailInfoPageState extends State<DetailInfoPage> {
                   : const Icon(Icons.check),
               onPressed: _isSaving ? null : _simpanPerubahan,
             )
-          else
+          else ...[
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: _konfirmasiHapus,
+            ),
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () => setState(() => _isEditMode = true),
-            )
+            ),
+          ],
         ],
       ),
       body: Padding(

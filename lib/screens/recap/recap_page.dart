@@ -36,6 +36,9 @@ class _RecapPageState extends State<RecapPage> with TickerProviderStateMixin {
         ),
         bottom: TabBar(
           controller: _tabController,
+          splashFactory: NoSplash.splashFactory, // ← tambahkan ini
+          overlayColor: WidgetStateProperty.all(
+              Colors.transparent), // ← hilangkan warna overlay
           tabs: const [
             Tab(text: 'Penjualan'),
             Tab(text: 'Pesanan'),
@@ -78,7 +81,13 @@ class PenjualanTab extends StatelessWidget {
             final item = data[index];
             return ListTile(
               title: Text(item['nama_produk']),
-              trailing: Text('${item['jumlah']} terjual'),
+              trailing: Text(
+                '${item['jumlah']} terjual',
+                style: const TextStyle(
+                  color: Colors.blue,
+                  fontSize: 15, // Increased font size the pesanan page trailing
+                ),
+              ),
             );
           },
         );
@@ -109,7 +118,14 @@ class PesananTab extends StatelessWidget {
             final item = data[index];
             return ListTile(
               title: Text('Periode: ${item['periode']}'),
-              trailing: Text('${item['jumlah']} pesanan'),
+              trailing: Text(
+                '${item['jumlah']} pesanan',
+                style: const TextStyle(
+                  color: Colors.blue,
+                  fontSize: 15, // Increased font size the pesanan page trailing
+                ),
+              ),
+              // onTap: ,
             );
           },
         );
@@ -146,7 +162,13 @@ class KeuntunganTab extends StatelessWidget {
 
             return ListTile(
               title: Text('Periode: ${item['periode']}'),
-              trailing: Text('Rp $formattedKeuntungan'),
+              trailing: Text(
+                'Rp $formattedKeuntungan',
+                style: const TextStyle(
+                  color: Colors.blue,
+                  fontSize: 15, // Increased font size the pesanan page trailing
+                ),
+              ),
             );
           },
         );

@@ -7,6 +7,7 @@ class Produk {
   String deskripsi_produk;
   String tambahan_produk;
   String gambar_url;
+  final bool isDeleted;
 
   Produk({
     this.id,
@@ -17,6 +18,7 @@ class Produk {
     required this.deskripsi_produk,
     required this.tambahan_produk,
     required this.gambar_url,
+    required this.isDeleted,
   });
 
   /*
@@ -54,6 +56,7 @@ class Produk {
       deskripsi_produk: map['deskripsi_produk'] ?? '',
       tambahan_produk: map['tambahan_produk'] ?? '',
       gambar_url: map['gambar_url'],
+      isDeleted: map['is_deleted'] ?? false,
     );
   }
 
@@ -67,6 +70,7 @@ class Produk {
       'deskripsi_produk': deskripsi_produk,
       'tambahan_produk': tambahan_produk,
       'gambar_url': gambar_url,
+      'is_deleted': isDeleted,
     };
   }
 }
