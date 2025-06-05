@@ -59,12 +59,12 @@ Berikut detail pesanan Anda:
 - Produk: ${_produk!.nama_produk}
 - Jumlah: ${widget.pesanan.jumlah} pcs
 - Alamat: ${widget.pesanan.alamat}
-- Tanggal Selesai: ${formatTanggal(widget.pesanan.tanggal_selesai)}
+- Tanggal Selesai: ${formatTanggal(widget.pesanan.tanggal_selesai)} WIB
 - Catatan: ${widget.pesanan.catatan}
 - Tambahan Harga: Rp ${NumberFormat("#,###", "id_ID").format(widget.pesanan.tambahan_harga)}
 - Total Harga: Rp ${NumberFormat("#,###", "id_ID").format(widget.pesanan.total_harga)}
 
-Terima kasih 🙏
+Terima kasih, ditunggu pesanan selanjutnya!
 """;
 
     final encodedPesan = Uri.encodeComponent(pesan);

@@ -117,7 +117,6 @@ class PesananTab extends StatelessWidget {
           itemBuilder: (context, index) {
             final item = data[index];
             final String periode = item['periode'] ?? 'Tidak diketahui';
-
             final int jumlah = item['jumlah'];
 
             return ExpansionTile(
@@ -153,19 +152,8 @@ class PesananTab extends StatelessWidget {
                         final String namaProduk =
                             e['nama_produk'] ?? 'Produk tidak dikenal';
                         final int jumlah = e['jumlah'] ?? 0;
-
-                        DateTime? tanggalSelesai;
-                        String tanggalFormat = 'Tanggal tidak tersedia';
-                        if (e['tanggal_selesai'] != null) {
-                          try {
-                            tanggalSelesai =
-                                DateTime.parse(e['tanggal_selesai']);
-                            tanggalFormat =
-                                '${tanggalSelesai.day.toString().padLeft(2, '0')}-${tanggalSelesai.month.toString().padLeft(2, '0')}-${tanggalSelesai.year}';
-                          } catch (e) {
-                            tanggalFormat = 'Format tanggal salah';
-                          }
-                        }
+                        final String tanggalFormat =
+                            e['tanggal_selesai'] ?? 'Tanggal tidak tersedia';
 
                         return ListTile(
                           title: Text(

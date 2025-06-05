@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:thesis_app/model/pesanan.dart';
 
@@ -150,11 +151,15 @@ class PesananDatabase {
             'nama_pemesan, jumlah, total_harga, produk(nama_produk, harga_modal), tanggal_selesai')
         .eq('user_id', userId);
 
-    return result.where((item) {
+    final List<Map<String, dynamic>> filtered = result.where((item) {
       final DateTime tanggal = DateTime.parse(item['tanggal_selesai']);
       final key = '${tanggal.year}-${tanggal.month.toString().padLeft(2, '0')}';
       return key == periode;
     }).map((item) {
+      final DateTime tanggal = DateTime.parse(item['tanggal_selesai']);
+      final String formattedTanggal = DateFormat("d MMMM yyyy", "id_ID")
+          .format(tanggal); // hasil: "5 Juni 2025"
+
       return {
         'nama_pemesan': item['nama_pemesan'],
         'jumlah': item['jumlah'],
@@ -162,8 +167,11 @@ class PesananDatabase {
         'nama_produk': item['produk']?['nama_produk'] ?? '',
         'produk': {
           'harga_modal': item['produk']?['harga_modal'] ?? 0,
-        }
+        },
+        'tanggal_selesai': formattedTanggal,
       };
     }).toList();
+
+    return filtered;
   }
 }
