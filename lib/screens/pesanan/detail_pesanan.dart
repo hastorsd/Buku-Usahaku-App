@@ -39,7 +39,6 @@ class _DetailPesananPageState extends State<DetailPesanan> {
   }
 
   void _kirimPesanWhatsApp() async {
-    // Pengecekan apakah nomor Whatsapp tidak null
     final nomorRaw = widget.pesanan.nomor_whatsapp;
 
     if (nomorRaw == null || nomorRaw.trim().isEmpty) {
@@ -49,8 +48,11 @@ class _DetailPesananPageState extends State<DetailPesanan> {
       return;
     }
 
-    final nomor = widget.pesanan.nomor_whatsapp.replaceAll(RegExp(r'^0'), '62');
-    final pesan = Uri.encodeComponent("""
+    final nomor =
+        nomorRaw.replaceAll(RegExp(r'\D'), ''); // hapus semua non-digit
+    final nomorWa = nomor.startsWith('0') ? '62${nomor.substring(1)}' : nomor;
+
+    final pesan = """
 Halo ${widget.pesanan.nama_pemesan},
 
 Berikut detail pesanan Anda:
@@ -63,11 +65,18 @@ Berikut detail pesanan Anda:
 - Total Harga: Rp ${NumberFormat("#,###", "id_ID").format(widget.pesanan.total_harga)}
 
 Terima kasih 🙏
-""");
+""";
 
-    final url = Uri.parse("https://wa.me/$nomor?text=$pesan");
+    final encodedPesan = Uri.encodeComponent(pesan);
+    final uri = Uri.parse("https://wa.me/$nomorWa?text=$encodedPesan");
 
-    launchUrl(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Gagal membuka WhatsApp")),
+      );
+    }
   }
 
   @override
