@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:thesis_app/database/produk_database.dart';
 import 'package:thesis_app/model/produk.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 final currencyFormatter = NumberFormat('#,##0', 'id_ID');
 
@@ -67,6 +68,17 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
     }
   }
 
+  Future<Uint8List?> compressImage(File file) async {
+    final result = await FlutterImageCompress.compressWithFile(
+      file.absolute.path,
+      minWidth: 800,
+      minHeight: 800,
+      quality: 70, // kamu bisa sesuaikan antara 0 - 100
+      format: CompressFormat.jpeg,
+    );
+    return result;
+  }
+
   Future<void> _submitProduk() async {
     if (_namaController.text.isEmpty || _jualController.text.isEmpty) {
       showDialog(
@@ -89,9 +101,15 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
 
     String? imageUrl = _imageUrl;
     if (_selectedImage != null) {
-      final bytes = await File(_selectedImage!.path).readAsBytes();
-      imageUrl =
-          await widget.produkDatabase.uploadImage(bytes, _selectedImage!.name);
+      final file = File(_selectedImage!.path);
+      final compressedBytes = await compressImage(file);
+
+      if (compressedBytes != null) {
+        imageUrl = await widget.produkDatabase.uploadImage(
+          compressedBytes,
+          _selectedImage!.name,
+        );
+      }
     }
 
     final userId = Supabase.instance.client.auth.currentUser!.id;

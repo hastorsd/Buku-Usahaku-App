@@ -116,7 +116,9 @@ class _PesananPageState extends State<PesananPage> {
                       child: Text('Terjadi kesalahan: ${snapshot.error}'));
                 }
 
-                final pesananList = snapshot.data ?? [];
+                final pesananList = (snapshot.data ?? [])
+                  ..sort(
+                      (a, b) => b.tanggal_selesai.compareTo(a.tanggal_selesai));
 
                 if (pesananList.isEmpty) {
                   return const Center(child: Text('Belum ada pesanan.'));

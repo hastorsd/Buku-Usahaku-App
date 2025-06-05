@@ -139,4 +139,31 @@ class PesananDatabase {
         .map((e) => {'periode': e.key, 'keuntungan': e.value})
         .toList();
   }
+
+  Future<List<Map<String, dynamic>>> getPesananPeriodeDetail(
+      String periode) async {
+    final userId = Supabase.instance.client.auth.currentUser!.id;
+
+    final result = await Supabase.instance.client
+        .from('pesanan')
+        .select(
+            'nama_pemesan, jumlah, total_harga, produk(nama_produk, harga_modal), tanggal_selesai')
+        .eq('user_id', userId);
+
+    return result.where((item) {
+      final DateTime tanggal = DateTime.parse(item['tanggal_selesai']);
+      final key = '${tanggal.year}-${tanggal.month.toString().padLeft(2, '0')}';
+      return key == periode;
+    }).map((item) {
+      return {
+        'nama_pemesan': item['nama_pemesan'],
+        'jumlah': item['jumlah'],
+        'total_harga': (item['total_harga'] ?? 0).toDouble(),
+        'nama_produk': item['produk']?['nama_produk'] ?? '',
+        'produk': {
+          'harga_modal': item['produk']?['harga_modal'] ?? 0,
+        }
+      };
+    }).toList();
+  }
 }

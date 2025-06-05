@@ -116,16 +116,73 @@ class PesananTab extends StatelessWidget {
           itemCount: data.length,
           itemBuilder: (context, index) {
             final item = data[index];
-            return ListTile(
-              title: Text('Periode: ${item['periode']}'),
+            final String periode = item['periode'] ?? 'Tidak diketahui';
+
+            final int jumlah = item['jumlah'];
+
+            return ExpansionTile(
+              title: Text('Periode: $periode'),
               trailing: Text(
-                '${item['jumlah']} pesanan',
+                '$jumlah pesanan',
                 style: const TextStyle(
                   color: Colors.blue,
-                  fontSize: 15, // Increased font size the pesanan page trailing
+                  fontSize: 15,
                 ),
               ),
-              // onTap: ,
+              children: [
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: PesananDatabase().getPesananPeriodeDetail(periode),
+                  builder: (context, detailSnapshot) {
+                    if (detailSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    if (!detailSnapshot.hasData ||
+                        detailSnapshot.data!.isEmpty) {
+                      return const ListTile(
+                          title: Text('Tidak ada data pesanan.'));
+                    }
+
+                    return Column(
+                      children: detailSnapshot.data!.map((e) {
+                        final String namaPemesan =
+                            e['nama_pemesan'] ?? 'Tanpa nama';
+                        final String namaProduk =
+                            e['nama_produk'] ?? 'Produk tidak dikenal';
+                        final int jumlah = e['jumlah'] ?? 0;
+
+                        DateTime? tanggalSelesai;
+                        String tanggalFormat = 'Tanggal tidak tersedia';
+                        if (e['tanggal_selesai'] != null) {
+                          try {
+                            tanggalSelesai =
+                                DateTime.parse(e['tanggal_selesai']);
+                            tanggalFormat =
+                                '${tanggalSelesai.day.toString().padLeft(2, '0')}-${tanggalSelesai.month.toString().padLeft(2, '0')}-${tanggalSelesai.year}';
+                          } catch (e) {
+                            tanggalFormat = 'Format tanggal salah';
+                          }
+                        }
+
+                        return ListTile(
+                          title: Text(
+                            '$namaPemesan ($namaProduk)',
+                            style: const TextStyle(color: Colors.blue),
+                          ),
+                          subtitle: Text(
+                            'Tanggal: $tanggalFormat',
+                            style: const TextStyle(
+                                color: Color.fromARGB(255, 99, 99, 99)),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                )
+              ],
             );
           },
         );
@@ -134,13 +191,33 @@ class PesananTab extends StatelessWidget {
   }
 }
 
-class KeuntunganTab extends StatelessWidget {
+class KeuntunganTab extends StatefulWidget {
   const KeuntunganTab({super.key});
 
   @override
+  State<KeuntunganTab> createState() => _KeuntunganTabState();
+}
+
+class _KeuntunganTabState extends State<KeuntunganTab> {
+  late Future<List<Map<String, dynamic>>> _rekapFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _rekapFuture = PesananDatabase().getRekapKeuntunganPerPeriode();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    String formatRupiah(dynamic value) {
+      final number =
+          value is String ? double.tryParse(value) : value.toDouble();
+      if (number == null) return 'Rp 0';
+      return 'Rp ${number.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}';
+    }
+
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: PesananDatabase().getRekapKeuntunganPerPeriode(),
+      future: _rekapFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -159,16 +236,55 @@ class KeuntunganTab extends StatelessWidget {
                       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
                       (Match m) => '${m[1]}.',
                     );
+            final String periode = item['periode'];
 
-            return ListTile(
-              title: Text('Periode: ${item['periode']}'),
+            return ExpansionTile(
+              title: Text('Periode: $periode'),
               trailing: Text(
                 'Rp $formattedKeuntungan',
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontSize: 15, // Increased font size the pesanan page trailing
-                ),
+                style: const TextStyle(color: Colors.blue, fontSize: 15),
               ),
+              children: [
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: PesananDatabase().getPesananPeriodeDetail(periode),
+                  builder: (context, detailSnapshot) {
+                    if (detailSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    if (!detailSnapshot.hasData ||
+                        detailSnapshot.data!.isEmpty) {
+                      return const ListTile(
+                          title: Text('Tidak ada transaksi.'));
+                    }
+
+                    return Column(
+                      children: detailSnapshot.data!.map((e) {
+                        final jumlah = e['jumlah'] ?? 0;
+                        final totalHarga = (e['total_harga'] ?? 0).toDouble();
+                        final hargaModal =
+                            (e['produk']?['harga_modal'] ?? 0).toDouble();
+                        final labaBersih = totalHarga - (jumlah * hargaModal);
+
+                        return ListTile(
+                          title: Text(
+                            '${e['nama_pemesan']} (${e['nama_produk']})',
+                            style: const TextStyle(color: Colors.blue),
+                          ),
+                          subtitle: Text(
+                            'Jumlah: $jumlah | Total: ${formatRupiah(totalHarga)} | Laba bersih: ${formatRupiah(labaBersih)}',
+                            style: const TextStyle(
+                                color: Color.fromARGB(255, 99, 99, 99)),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                )
+              ],
             );
           },
         );

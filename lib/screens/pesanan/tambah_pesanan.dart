@@ -57,7 +57,7 @@ class _TambahPesananState extends State<TambahPesanan> {
     final selected = await showDatePicker(
       context: context,
       initialDate: now,
-      firstDate: now,
+      firstDate: DateTime(2000), // Dulu bisa pilih tanggal lama
       lastDate: DateTime(now.year + 5),
     );
 
