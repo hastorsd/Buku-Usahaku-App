@@ -24,22 +24,17 @@ class PesananDatabase {
           data.map((pesananMap) => Pesanan.fromMap(pesananMap)).toList());
 
   // update pesanan
-  Future updatePesanan(
-    Pesanan pesananLama,
-    String namaPemesanBaru,
-    String alamatBaru,
-    DateTime tanggalSelesaiBaru,
-    String catatanBaru,
-    double tambahanHargaBaru,
-    double totalHargaBaru,
-  ) async {
+  Future<void> updatePesanan(Pesanan pesananLama, Pesanan pesananBaru) async {
     await database.from('pesanan').update({
-      'nama_pemesan': namaPemesanBaru,
-      'alamat': alamatBaru,
-      'tanggal_selesai': tanggalSelesaiBaru.toIso8601String(),
-      'catatan': catatanBaru,
-      'tambahan_harga': tambahanHargaBaru,
-      'total_harga': totalHargaBaru,
+      'nama_pemesan': pesananBaru.nama_pemesan,
+      'produk_id': pesananBaru.produk_id,
+      'jumlah': pesananBaru.jumlah,
+      'alamat': pesananBaru.alamat,
+      'tanggal_selesai': pesananBaru.tanggal_selesai.toIso8601String(),
+      'catatan': pesananBaru.catatan,
+      'tambahan_harga': pesananBaru.tambahan_harga,
+      'total_harga': pesananBaru.total_harga,
+      'nomor_whatsapp': pesananBaru.nomor_whatsapp,
     }).eq('id', pesananLama.id!);
   }
 

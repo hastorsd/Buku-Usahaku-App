@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:thesis_app/database/pesanan_database.dart';
 import 'package:thesis_app/model/pesanan.dart';
 import 'package:thesis_app/model/produk.dart';
 import 'package:thesis_app/database/produk_database.dart';
+import 'package:thesis_app/screens/pesanan/tambah_pesanan.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailPesanan extends StatefulWidget {
@@ -28,7 +32,7 @@ class _DetailPesananPageState extends State<DetailPesanan> {
   Future<void> _loadProduk() async {
     final produk =
         await ProdukDatabase().getProdukById(widget.pesanan.produk_id);
-    if (!mounted) return; // <--- Tambahan ini penting
+    if (!mounted) return; // tambahan penting
     setState(() {
       _produk = produk;
     });
@@ -43,13 +47,19 @@ class _DetailPesananPageState extends State<DetailPesanan> {
 
     if (nomorRaw == null || nomorRaw.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Harap masukkan nomor WhatsApp pemesan")),
+        const SnackBar(content: Text("Nomor WhatsApp tidak tersedia")),
       );
       return;
     }
 
-    final nomor =
-        nomorRaw.replaceAll(RegExp(r'\D'), ''); // hapus semua non-digit
+    if (_produk == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Data produk belum termuat")),
+      );
+      return;
+    }
+
+    final nomor = nomorRaw.replaceAll(RegExp(r'\D'), '');
     final nomorWa = nomor.startsWith('0') ? '62${nomor.substring(1)}' : nomor;
 
     final pesan = """
@@ -68,13 +78,18 @@ Terima kasih, ditunggu pesanan selanjutnya!
 """;
 
     final encodedPesan = Uri.encodeComponent(pesan);
-    final uri = Uri.parse("https://wa.me/$nomorWa?text=$encodedPesan");
+
+    final uri = Uri.parse(
+        "whatsapp://send?phone=$nomorWa&text=$encodedPesan"); // << intent scheme WhatsApp
 
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
+      debugPrint('Tidak dapat membuka WhatsApp dengan URI: $uri');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Gagal membuka WhatsApp")),
+        const SnackBar(
+            content: Text(
+                "Gagal membuka WhatsApp. Pastikan WhatsApp telah terinstal.")),
       );
     }
   }
@@ -82,7 +97,66 @@ Terima kasih, ditunggu pesanan selanjutnya!
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Detail Pesanan')),
+      appBar: AppBar(
+          title: const Text('Detail Pesanan'),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () async {
+                await showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  builder: (context) => Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Material(
+                      child: TambahPesanan(
+                        pesananDatabase: PesananDatabase(),
+                        pesanan: widget.pesanan, // mode edit
+                      ),
+                    ),
+                  ),
+                );
+                setState(() {}); // Refresh data setelah edit
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Hapus Pesanan'),
+                    content: const Text('Yakin ingin menghapus pesanan ini?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Batal'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Hapus'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  await PesananDatabase().deletePesanan(widget.pesanan);
+                  Navigator.pop(context); // Kembali dari halaman detail
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Pesanan berhasil dihapus')),
+                  );
+                }
+              },
+            ),
+          ]),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _produk == null

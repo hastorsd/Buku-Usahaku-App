@@ -7,8 +7,13 @@ import 'package:thesis_app/model/produk.dart';
 
 class TambahPesanan extends StatefulWidget {
   final PesananDatabase pesananDatabase;
+  final Pesanan? pesanan; // Tambahan: null berarti tambah, ada berarti edit
 
-  const TambahPesanan({super.key, required this.pesananDatabase});
+  const TambahPesanan({
+    super.key,
+    required this.pesananDatabase,
+    this.pesanan,
+  });
 
   @override
   State<TambahPesanan> createState() => _TambahPesananState();
@@ -33,7 +38,29 @@ class _TambahPesananState extends State<TambahPesanan> {
   @override
   void initState() {
     super.initState();
-    _loadProduk();
+    _loadProduk().then((_) {
+      // Inisialisasi form jika mode edit
+      if (widget.pesanan != null) {
+        final p = widget.pesanan!;
+        _namaPemesanController.text = p.nama_pemesan;
+        _alamatController.text = p.alamat;
+        _catatanController.text = p.catatan ?? '';
+        _tambahanHargaController.text = p.tambahan_harga.toString();
+        _nomorWhatsappController.text = p.nomor_whatsapp ?? '';
+        jumlah = p.jumlah;
+        tanggalSelesai = p.tanggal_selesai;
+
+        // Temukan produk yang sesuai dari list
+        try {
+          _selectedProduk =
+              _produkList.firstWhere((produk) => produk.id == p.produk_id);
+        } catch (_) {
+          _selectedProduk = _produkList.isNotEmpty ? _produkList.first : null;
+        }
+
+        setState(() {});
+      }
+    });
   }
 
   Future<void> _loadProduk() async {
@@ -49,6 +76,7 @@ class _TambahPesananState extends State<TambahPesanan> {
     _alamatController.dispose();
     _catatanController.dispose();
     _tambahanHargaController.dispose();
+    _nomorWhatsappController.dispose();
     super.dispose();
   }
 
@@ -56,15 +84,15 @@ class _TambahPesananState extends State<TambahPesanan> {
     final now = DateTime.now();
     final selected = await showDatePicker(
       context: context,
-      initialDate: now,
-      firstDate: DateTime(2000), // Dulu bisa pilih tanggal lama
+      initialDate: tanggalSelesai ?? now,
+      firstDate: DateTime(2000),
       lastDate: DateTime(now.year + 5),
     );
 
     if (selected != null) {
       final time = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.now(),
+        initialTime: TimeOfDay.fromDateTime(tanggalSelesai ?? now),
       );
       if (time != null) {
         setState(() {
@@ -84,24 +112,30 @@ class _TambahPesananState extends State<TambahPesanan> {
     if (_formKey.currentState!.validate() &&
         tanggalSelesai != null &&
         _selectedProduk != null) {
-      final totalHarga = (_selectedProduk!.harga_jual * jumlah) +
-          (double.tryParse(_tambahanHargaController.text) ?? 0);
+      final tambahanHarga = double.tryParse(_tambahanHargaController.text) ?? 0;
+
+      final totalHarga = (_selectedProduk!.harga_jual * jumlah) + tambahanHarga;
 
       final pesanan = Pesanan(
-        // user_id: '', // akan diisi otomatis di database
+        id: widget.pesanan?.id,
         nama_pemesan: _namaPemesanController.text,
         produk_id: _selectedProduk!.id!,
         jumlah: jumlah,
         alamat: _alamatController.text,
         tanggal_selesai: tanggalSelesai!,
         catatan: _catatanController.text,
-        tambahan_harga: double.tryParse(_tambahanHargaController.text) ?? 0,
+        tambahan_harga: tambahanHarga,
         nomor_whatsapp: _nomorWhatsappController.text,
         total_harga: totalHarga,
       );
 
-      await widget.pesananDatabase.createPesanan(pesanan);
-      Navigator.pop(context); // kembali setelah selesai tambah
+      if (widget.pesanan == null) {
+        await widget.pesananDatabase.createPesanan(pesanan);
+      } else {
+        await widget.pesananDatabase.updatePesanan(widget.pesanan!, pesanan);
+      }
+
+      Navigator.pop(context); // kembali setelah simpan
     }
   }
 
@@ -120,11 +154,11 @@ class _TambahPesananState extends State<TambahPesanan> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Tambah Pesanan',
-                  style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                widget.pesanan == null ? 'Tambah Pesanan' : 'Edit Pesanan',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 12),
-
-              // Dropdown produk
               DropdownButtonFormField<Produk>(
                 value: _selectedProduk,
                 items: _produkList.map((produk) {
@@ -143,7 +177,6 @@ class _TambahPesananState extends State<TambahPesanan> {
                     value == null ? 'Wajib memilih produk' : null,
               ),
               const SizedBox(height: 8),
-
               TextFormField(
                 controller: _namaPemesanController,
                 decoration: const InputDecoration(labelText: 'Nama Pemesan'),
@@ -203,7 +236,9 @@ class _TambahPesananState extends State<TambahPesanan> {
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: _simpanPesanan,
-                child: const Text('Simpan Pesanan'),
+                child: Text(widget.pesanan == null
+                    ? 'Simpan Pesanan'
+                    : 'Perbarui Pesanan'),
               ),
             ],
           ),

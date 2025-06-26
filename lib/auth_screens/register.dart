@@ -191,21 +191,21 @@ class _RegisterPageState extends State<RegisterPage> {
                   width: 30,
                 ),
               ),
-              const SizedBox(width: 20),
-              // Apple
-              ElevatedButton(
-                onPressed: () {
-                  // Tambahkan fungsi login Apple
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(), backgroundColor: Colors.white,
-                  padding: EdgeInsets.all(10), // Button color
-                ),
-                child: Image.asset(
-                  'assets/images/apple.png',
-                  width: 30,
-                ),
-              ),
+              // const SizedBox(width: 20),
+              // // Apple
+              // ElevatedButton(
+              //   onPressed: () {
+              //     // Tambahkan fungsi login Apple
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //     shape: CircleBorder(), backgroundColor: Colors.white,
+              //     padding: EdgeInsets.all(10), // Button color
+              //   ),
+              //   child: Image.asset(
+              //     'assets/images/apple.png',
+              //     width: 30,
+              //   ),
+              // ),
             ],
           ),
 

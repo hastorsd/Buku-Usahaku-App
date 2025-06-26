@@ -161,12 +161,56 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             GestureDetector(
-              onTap: () async {
-                final picked =
-                    await picker.pickImage(source: ImageSource.gallery);
-                if (picked != null) {
-                  setState(() => _selectedImage = picked);
-                }
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Pilih Sumber Gambar'),
+                      content: SingleChildScrollView(
+                        child: ListBody(
+                          children: <Widget>[
+                            GestureDetector(
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.image),
+                                  SizedBox(width: 8),
+                                  Text('Ambil dari Galeri'),
+                                ],
+                              ),
+                              onTap: () async {
+                                Navigator.pop(context);
+                                final picked = await picker.pickImage(
+                                    source: ImageSource.gallery);
+                                if (picked != null) {
+                                  setState(() => _selectedImage = picked);
+                                }
+                              },
+                            ),
+                            const Padding(padding: EdgeInsets.all(8.0)),
+                            GestureDetector(
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.camera_alt),
+                                  SizedBox(width: 8),
+                                  Text('Ambil dari Kamera'),
+                                ],
+                              ),
+                              onTap: () async {
+                                Navigator.pop(context);
+                                final picked = await picker.pickImage(
+                                    source: ImageSource.camera);
+                                if (picked != null) {
+                                  setState(() => _selectedImage = picked);
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
               },
               child: Container(
                 height: 160,

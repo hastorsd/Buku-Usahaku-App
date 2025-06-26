@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="thesis_app"
+        android:label="Buku Usahaku!"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -42,4 +42,9 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
+    <!-- WhatsApp requires the following permission to be able to open links in the app. -->
+    <queries>
+        <package android:name="com.whatsapp" />
+    </queries>
+         
 </manifest>

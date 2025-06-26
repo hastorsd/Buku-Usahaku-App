@@ -113,6 +113,8 @@ class _LoginPageState extends State<LoginPage> {
                 controller: _emailController,
                 decoration: InputDecoration(
                   hintText: "contoh@example.com",
+                  hintStyle: TextStyle(
+                      color: Colors.grey), // Set hint text color to gray
                   labelText: "Email",
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -222,21 +224,21 @@ class _LoginPageState extends State<LoginPage> {
                       width: 30,
                     ),
                   ),
-                  const SizedBox(width: 20),
+                  // const SizedBox(width: 20),
                   // Apple
-                  ElevatedButton(
-                    onPressed: () {
-                      // Tambahkan fungsi login Apple
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: CircleBorder(), backgroundColor: Colors.white,
-                      padding: EdgeInsets.all(10), // Button color
-                    ),
-                    child: Image.asset(
-                      'assets/images/apple.png',
-                      width: 30,
-                    ),
-                  ),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     // Tambahkan fungsi login Apple
+                  //   },
+                  //   style: ElevatedButton.styleFrom(
+                  //     shape: CircleBorder(), backgroundColor: Colors.white,
+                  //     padding: EdgeInsets.all(10), // Button color
+                  //   ),
+                  //   child: Image.asset(
+                  //     'assets/images/apple.png',
+                  //     width: 30,
+                  //   ),
+                  // ),
                 ],
               ),
 
