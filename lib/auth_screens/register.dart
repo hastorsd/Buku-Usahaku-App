@@ -28,10 +28,12 @@ class _RegisterPageState extends State<RegisterPage> {
   void loginWithGoogle() async {
     try {
       await authService.signInWithGoogle();
+
+      Navigator.pop(context);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: $e")));
+            .showSnackBar(SnackBar(content: Text("$e")));
       }
     }
   }
@@ -41,26 +43,21 @@ class _RegisterPageState extends State<RegisterPage> {
     // prepare data
     final email = _emailController.text;
     final password = _passwordController.text;
-    final confirmPassword = _confirmPasswordController.text;
-
-    // check that password match
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Password tidak sama")));
-    }
 
     // attempt sign up
     try {
       await authService.signUpWithEmailPassword(email, password);
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Register berhasil")),
+      );
+
       // pop this register page
       Navigator.pop(context);
-
-      // catch any error
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: $e")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Email $email sudah terdaftar, silahkan login")));
       }
     }
   }
@@ -129,10 +126,49 @@ class _RegisterPageState extends State<RegisterPage> {
 
           // button
           ElevatedButton(
-            onPressed: signUp,
+            onPressed: () {
+              final email = _emailController.text;
+              final password = _passwordController.text;
+              final confirmPassword = _confirmPasswordController.text;
+
+              // form check
+              if (email.isEmpty ||
+                  password.isEmpty ||
+                  confirmPassword.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Semua form harus diisi")),
+                );
+                return;
+              }
+
+              // Email validation
+              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+              if (!emailRegex.hasMatch(email)) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Email tidak valid")),
+                );
+                return;
+              }
+
+              // Password length check
+              if (password.length < 6) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Password minimal 6 karakter")),
+                );
+                return;
+              }
+
+              if (password != confirmPassword) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Password tidak sama")),
+                );
+                return;
+              }
+              signUp();
+            },
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white,
-              backgroundColor: Colors.black, // text color
+              backgroundColor: Colors.blue, // text color
               padding: EdgeInsets.symmetric(
                   horizontal: 50, vertical: 15), // increase button size
             ),

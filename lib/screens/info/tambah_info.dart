@@ -75,14 +75,24 @@ class _TambahInfoState extends State<TambahInfo> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                  ),
                   onPressed: _isLoading ? null : _simpanInfo,
                   child: _isLoading
                       ? const CircularProgressIndicator(
                           color: Colors.white,
                         )
-                      : const Text('Simpan'),
+                      : const Text(
+                          'Simpan',
+                          style: TextStyle(color: Colors.white),
+                        ),
                 ),
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),

@@ -135,7 +135,7 @@ class _TambahPesananState extends State<TambahPesanan> {
         await widget.pesananDatabase.updatePesanan(widget.pesanan!, pesanan);
       }
 
-      Navigator.pop(context); // kembali setelah simpan
+      Navigator.pop(context, true); // kembali setelah simpan
     }
   }
 
@@ -156,33 +156,65 @@ class _TambahPesananState extends State<TambahPesanan> {
             children: [
               Text(
                 widget.pesanan == null ? 'Tambah Pesanan' : 'Edit Pesanan',
-                style: Theme.of(context).textTheme.titleLarge,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<Produk>(
-                value: _selectedProduk,
-                items: _produkList.map((produk) {
-                  return DropdownMenuItem(
-                    value: produk,
-                    child: Text(produk.nama_produk),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedProduk = value;
-                  });
-                },
-                decoration: const InputDecoration(labelText: 'Pilih Produk'),
-                validator: (value) =>
-                    value == null ? 'Wajib memilih produk' : null,
-              ),
+              const SizedBox(height: 16),
+              _produkList.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16, horizontal: 12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
+                        ),
+                        child: const Text(
+                          'Belum ada produk, tidak dapat menambah pesanan.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    )
+                  : DropdownButtonFormField<Produk>(
+                      value: _selectedProduk,
+                      items: _produkList.map((produk) {
+                        return DropdownMenuItem(
+                          value: produk,
+                          child: Text(produk.nama_produk),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedProduk = value;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Pilih Produk',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                      ),
+                      validator: (value) =>
+                          value == null ? 'Wajib memilih produk' : null,
+                    ),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _namaPemesanController,
-                decoration: const InputDecoration(labelText: 'Nama Pemesan'),
-                validator: (value) => value!.isEmpty ? 'Wajib diisi' : null,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: TextFormField(
+                  controller: _namaPemesanController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama Pemesan',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
+                  validator: (value) => value!.isEmpty ? 'Wajib diisi' : null,
+                ),
               ),
-              const SizedBox(height: 8),
               Row(
                 children: [
                   const Text('Jumlah'),
@@ -206,40 +238,106 @@ class _TambahPesananState extends State<TambahPesanan> {
                   ),
                 ],
               ),
-              TextFormField(
-                controller: _alamatController,
-                decoration: const InputDecoration(labelText: 'Alamat Pemesan'),
-                validator: (value) => value!.isEmpty ? 'Wajib diisi' : null,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: TextFormField(
+                  controller: _alamatController,
+                  decoration: const InputDecoration(
+                    labelText: 'Alamat Pemesan',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
+                  validator: (value) => value!.isEmpty ? 'Wajib diisi' : null,
+                ),
               ),
-              const SizedBox(height: 8),
-              ListTile(
-                title: Text(dateStr),
-                trailing: const Icon(Icons.calendar_today),
+              // const SizedBox(height: 8),
+              GestureDetector(
                 onTap: _pilihTanggal,
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_today),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            labelText: 'Tanggal Selesai',
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12)),
+                            ),
+                          ),
+                          controller: TextEditingController(text: dateStr),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              TextFormField(
-                controller: _catatanController,
-                decoration: const InputDecoration(labelText: 'Catatan'),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: TextFormField(
+                  controller: _catatanController,
+                  decoration: const InputDecoration(
+                    labelText: 'Catatan (opsional)',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
+                ),
               ),
-              TextFormField(
-                controller: _tambahanHargaController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                    labelText: 'Tambahan Harga (opsional)'),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: TextFormField(
+                  controller: _tambahanHargaController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Tambahan Harga (opsional)',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
+                ),
               ),
-              TextFormField(
-                controller: _nomorWhatsappController,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                    labelText: 'Nomor Whatsapp (opsional)'),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: TextFormField(
+                  controller: _nomorWhatsappController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    labelText: 'Nomor Whatsapp (opsional)',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: _simpanPesanan,
-                child: Text(widget.pesanan == null
-                    ? 'Simpan Pesanan'
-                    : 'Perbarui Pesanan'),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                  ),
+                  onPressed: _simpanPesanan,
+                  child: Text(
+                      widget.pesanan == null
+                          ? 'Simpan Pesanan'
+                          : 'Perbarui Pesanan',
+                      style: const TextStyle(color: Colors.white)),
+                ),
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),

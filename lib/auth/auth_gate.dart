@@ -4,15 +4,15 @@ AUTH GATE - This will continuously listen for auth state changes.
 
 ------------------------------------------------------------------------------
 
-unauthenticated -> Login Page
-authenticated   -> Profile Page
+unauthenticated -> Halaman Login
+authenticated   -> Halaman Produk
 
 */
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:thesis_app/auth_screens/login.dart';
-import 'package:thesis_app/navigation_menu.dart';
+import 'package:thesis_app/widgets/navigation_menu.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});

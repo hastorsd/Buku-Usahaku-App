@@ -51,7 +51,7 @@ class NavigationMenu extends StatelessWidget {
                 ),
               ),
             ),
-            // ✅ Garis aktif animasi
+            // Garis aktif animasi
             Positioned(
               width: MediaQuery.of(context).size.width,
               child: AnimatedAlign(

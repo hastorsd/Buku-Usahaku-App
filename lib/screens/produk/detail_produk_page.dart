@@ -16,8 +16,8 @@ class DetailProdukPage extends StatefulWidget {
 class _DetailProdukPageState extends State<DetailProdukPage> {
   final ProdukDatabase produkDatabase = ProdukDatabase();
 
-  void _editProduk(BuildContext context) {
-    showModalBottomSheet(
+  void _editProduk(BuildContext context) async {
+    final result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -28,6 +28,21 @@ class _DetailProdukPageState extends State<DetailProdukPage> {
         produk: widget.produk,
       ),
     );
+
+    if (result == true) {
+      // Ambil data produk terbaru dari database
+      final updated = await produkDatabase.getProdukById(widget.produk.id!);
+      if (updated != null && mounted) {
+        setState(() {
+          widget.produk.nama_produk = updated.nama_produk;
+          widget.produk.harga_jual = updated.harga_jual;
+          widget.produk.harga_modal = updated.harga_modal;
+          widget.produk.deskripsi_produk = updated.deskripsi_produk;
+          widget.produk.tambahan_produk = updated.tambahan_produk;
+          widget.produk.gambar_url = updated.gambar_url;
+        });
+      }
+    }
   }
 
   void _deleteProduk(BuildContext context) async {
@@ -43,7 +58,7 @@ class _DetailProdukPageState extends State<DetailProdukPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Hapus'),
+            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

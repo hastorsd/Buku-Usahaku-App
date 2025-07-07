@@ -47,7 +47,7 @@ class _DetailPesananPageState extends State<DetailPesanan> {
 
     if (nomorRaw == null || nomorRaw.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Nomor WhatsApp tidak tersedia")),
+        const SnackBar(content: Text("Harap masukkan nomor WhatsApp")),
       );
       return;
     }
@@ -80,7 +80,7 @@ Terima kasih, ditunggu pesanan selanjutnya!
     final encodedPesan = Uri.encodeComponent(pesan);
 
     final uri = Uri.parse(
-        "whatsapp://send?phone=$nomorWa&text=$encodedPesan"); // << intent scheme WhatsApp
+        "whatsapp://send?phone=$nomorWa&text=$encodedPesan"); // << intent scheme teknologi WhatsApp
 
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -97,6 +97,7 @@ Terima kasih, ditunggu pesanan selanjutnya!
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
           title: const Text('Detail Pesanan'),
           centerTitle: true,
@@ -104,26 +105,43 @@ Terima kasih, ditunggu pesanan selanjutnya!
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () async {
-                await showModalBottomSheet(
+                final updated = await showModalBottomSheet<bool>(
                   context: context,
                   isScrollControlled: true,
                   shape: const RoundedRectangleBorder(
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(16)),
                   ),
-                  builder: (context) => Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    child: Material(
-                      child: TambahPesanan(
-                        pesananDatabase: PesananDatabase(),
-                        pesanan: widget.pesanan, // mode edit
-                      ),
-                    ),
+                  builder: (_) => TambahPesanan(
+                    pesananDatabase: PesananDatabase(),
+                    pesanan: widget.pesanan,
                   ),
                 );
-                setState(() {}); // Refresh data setelah edit
+
+                if (updated == true) {
+                  // Ambil ulang data dari database
+                  final updatedPesanan = await PesananDatabase()
+                      .getPesananById(widget.pesanan.id!);
+                  final updatedProduk = await ProdukDatabase()
+                      .getProdukById(updatedPesanan!.produk_id);
+
+                  setState(() {
+                    widget.pesanan.nama_pemesan = updatedPesanan.nama_pemesan;
+                    widget.pesanan.alamat = updatedPesanan.alamat;
+                    widget.pesanan.jumlah = updatedPesanan.jumlah;
+                    widget.pesanan.tanggal_selesai =
+                        updatedPesanan.tanggal_selesai;
+                    widget.pesanan.catatan = updatedPesanan.catatan;
+                    widget.pesanan.nomor_whatsapp =
+                        updatedPesanan.nomor_whatsapp;
+                    widget.pesanan.total_harga = updatedPesanan.total_harga;
+                    widget.pesanan.tambahan_harga =
+                        updatedPesanan.tambahan_harga;
+                    widget.pesanan.produk_id = updatedPesanan.produk_id;
+
+                    _produk = updatedProduk;
+                  });
+                }
               },
             ),
             IconButton(
@@ -141,7 +159,8 @@ Terima kasih, ditunggu pesanan selanjutnya!
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Hapus'),
+                        child: const Text('Hapus',
+                            style: TextStyle(color: Colors.red)),
                       ),
                     ],
                   ),
@@ -149,7 +168,7 @@ Terima kasih, ditunggu pesanan selanjutnya!
 
                 if (confirm == true) {
                   await PesananDatabase().deletePesanan(widget.pesanan);
-                  Navigator.pop(context); // Kembali dari halaman detail
+                  Navigator.pop(context, true); // Kembali dari halaman detail
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Pesanan berhasil dihapus')),
                   );
@@ -157,62 +176,74 @@ Terima kasih, ditunggu pesanan selanjutnya!
               },
             ),
           ]),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SafeArea(
         child: _produk == null
             ? const Center(child: CircularProgressIndicator())
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(widget.pesanan.nama_pemesan,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      )),
-                  const SizedBox(height: 8),
-                  _buildDataPesanan(
-                      'Produk:', _produk!.nama_produk, Colors.blue),
-                  _buildDataPesanan('Jumlah:',
-                      '${widget.pesanan.jumlah.toString()} pcs', Colors.blue),
-                  _buildDataPesanan(
-                      'Alamat:', widget.pesanan.alamat, Colors.blue),
-                  _buildDataPesanan(
-                      'Tanggal Selesai:',
-                      formatTanggal(widget.pesanan.tanggal_selesai),
-                      Colors.blue),
-                  _buildDataPesanan(
-                      'Catatan:', widget.pesanan.catatan, Colors.blue),
-                  _buildDataPesanan(
-                      'Tambahan Harga:',
-                      'Rp ${NumberFormat("#,###", "id_ID").format(widget.pesanan.tambahan_harga)}',
-                      Colors.blue),
-                  _buildDataPesanan(
-                      'Total Harga:',
-                      'Rp ${NumberFormat("#,###", "id_ID").format(widget.pesanan.total_harga)}',
-                      Colors.blue),
-                  const SizedBox(height: 8),
-                  _buildDataPesanan('No. Whatsapp:',
-                      widget.pesanan.nomor_whatsapp, Colors.blue),
-                  const SizedBox(height: 20),
-                  Center(
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 16.0),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Ingin menghubungi pemesan?",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
+                        Text(widget.pesanan.nama_pemesan,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            )),
                         const SizedBox(height: 8),
-                        TextButton.icon(
-                          icon: const FaIcon(FontAwesomeIcons.whatsapp,
-                              color: Colors.green, size: 40),
-                          label: const Text("Hubungi via WhatsApp"),
-                          onPressed: _kirimPesanWhatsApp,
+                        _buildDataPesanan(
+                            'Produk:', _produk!.nama_produk, Colors.blue),
+                        _buildDataPesanan(
+                            'Jumlah:',
+                            '${widget.pesanan.jumlah.toString()} pcs',
+                            Colors.blue),
+                        _buildDataPesanan(
+                            'Alamat:', widget.pesanan.alamat, Colors.blue),
+                        _buildDataPesanan(
+                            'Tanggal Selesai:',
+                            formatTanggal(widget.pesanan.tanggal_selesai),
+                            Colors.blue),
+                        _buildDataPesanan(
+                            'Catatan:', widget.pesanan.catatan, Colors.blue),
+                        _buildDataPesanan(
+                            'Tambahan Harga:',
+                            'Rp ${NumberFormat("#,###", "id_ID").format(widget.pesanan.tambahan_harga)}',
+                            Colors.blue),
+                        _buildDataPesanan(
+                            'Total Harga:',
+                            'Rp ${NumberFormat("#,###", "id_ID").format(widget.pesanan.total_harga)}',
+                            Colors.blue),
+                        const SizedBox(height: 8),
+                        _buildDataPesanan('No. Whatsapp:',
+                            widget.pesanan.nomor_whatsapp, Colors.blue),
+                        const SizedBox(height: 50),
+                        Center(
+                          child: Column(
+                            children: [
+                              const Text(
+                                "Ingin menghubungi pemesan?",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 8),
+                              TextButton.icon(
+                                icon: const FaIcon(FontAwesomeIcons.whatsapp,
+                                    color: Colors.green, size: 40),
+                                label: const Text(
+                                    "Kirim Data Pesanan via WhatsApp"),
+                                onPressed: _kirimPesanWhatsApp,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  );
+                },
               ),
       ),
     );

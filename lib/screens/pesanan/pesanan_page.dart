@@ -112,11 +112,22 @@ class _PesananPageState extends State<PesananPage> {
                 }
 
                 if (snapshot.hasError) {
+                  // Check for common connection error messages
+                  final errorMsg = snapshot.error.toString().toLowerCase();
+                  if (errorMsg.contains('socket') ||
+                      errorMsg.contains('network') ||
+                      errorMsg.contains('failed host lookup') ||
+                      errorMsg.contains('connection refused') ||
+                      errorMsg.contains('no address associated')) {
+                    return const Center(
+                        child: Text(
+                            'Tidak ada koneksi, pastikan Anda terhubung ke internet'));
+                  }
                   return Center(
                       child: Text('Terjadi kesalahan: ${snapshot.error}'));
                 }
 
-                final pesananList = (snapshot.data ?? [])
+                final pesananList = (snapshot.data!)
                   ..sort(
                       (a, b) => b.tanggal_selesai.compareTo(a.tanggal_selesai));
 
@@ -183,33 +194,6 @@ class _PesananPageState extends State<PesananPage> {
                                   ),
                                   textAlign: TextAlign.right,
                                 ),
-//                                 InkWell(
-//                                   child: const Padding(
-//                                     padding: EdgeInsets.only(top: 4.0),
-//                                     child: const FaIcon(
-//                                         FontAwesomeIcons.whatsapp,
-//                                         color: Colors.green,
-//                                         size: 40),
-//                                   ),
-//                                   onTap: () {
-//                                     final pesan = Uri.encodeComponent(
-//                                         '''Halo ${pesanan.nama_pemesan}, berikut detail pesanan Anda:
-// Produk: ${pesanan.jumlah} pcs
-// Alamat: ${pesanan.alamat}
-// Catatan: ${pesanan.catatan}
-// Total: Rp ${NumberFormat("#,###", "id_ID").format(pesanan.total_harga)}
-// Tanggal Selesai: ${formatTanggal(pesanan.tanggal_selesai)}''');
-
-//                                     // Format nomor WhatsApp
-//                                     final nomor = formatNomorWhatsapp(
-//                                         pesanan.nomor_whatsapp);
-
-//                                     final url =
-//                                         'https://api.whatsapp.com/send?phone=$nomor&text=$pesan';
-
-//                                     launchUrl(Uri.parse(url));
-//                                   },
-//                                 ),
                               ],
                             ),
                             onTap: () {

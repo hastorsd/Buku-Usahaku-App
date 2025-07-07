@@ -4,14 +4,21 @@ import 'package:thesis_app/database/info_database.dart';
 import 'package:thesis_app/model/info.dart';
 import 'package:thesis_app/screens/info/detail_info_page.dart';
 import 'package:thesis_app/screens/info/tambah_info.dart';
+import 'package:thesis_app/widgets/logout_icon.dart';
 
-class InfoPage extends StatelessWidget {
+class InfoPage extends StatefulWidget {
   const InfoPage({super.key});
 
+  @override
+  State<InfoPage> createState() => _InfoPageState();
+}
+
+class _InfoPageState extends State<InfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text(
           'Catatan Informasi Usaha',
           style: TextStyle(
@@ -19,12 +26,16 @@ class InfoPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        leading: LogoutIcon(),
       ),
       body: StreamBuilder<List<Info>>(
         stream: InfoDatabase().stream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Terjadi kesalahan: ${snapshot.error}'));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('Belum ada catatan'));
@@ -44,15 +55,26 @@ class InfoPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final info = infos[index];
                 final formatted =
-                    DateFormat("d MMMM y", "id").format(info.createdAt);
+                    DateFormat("d MMMM y", "id_ID").format(info.createdAt);
                 return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    // Tunggu hasil dari halaman detail.
+                    // Jika catatan dihapus, `DetailInfoPage` akan mengembalikan `true`.
+                    final bool? result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => DetailInfoPage(info: info),
                       ),
                     );
+                    // Kita memanggil setState() di InfoPage. Ini akan memicu
+                    // StreamBuilder untuk memeriksa stream Supabase lagi.
+                    // Walaupun Supabase stream sudah real-time, ini membantu
+                    // memastikan UI terupdate setelah kembali dari halaman detail.
+                    if (result == true || result == false || result == null) {
+                      setState(() {
+                        // Tidak ada logic khusus di sini, hanya memicu rebuild
+                      });
+                    }
                   },
                   child: Card(
                     elevation: 2,
@@ -95,11 +117,17 @@ class InfoPage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          // Sama seperti di atas, tunggu hasil dari halaman tambah catatan.
+          final bool? result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const TambahInfo()),
           );
+          if (result == true || result == false || result == null) {
+            setState(() {
+              // Memicu rebuild InfoPage
+            });
+          }
         },
         backgroundColor: const Color(0xFF007AFF),
         shape: const RoundedRectangleBorder(

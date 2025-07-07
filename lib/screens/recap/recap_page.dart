@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:thesis_app/database/pesanan_database.dart';
+import 'package:thesis_app/widgets/logout_icon.dart';
 
 class RecapPage extends StatefulWidget {
   const RecapPage({super.key});
@@ -27,6 +28,7 @@ class _RecapPageState extends State<RecapPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text(
           'Rekapitulasi',
           style: TextStyle(
@@ -34,9 +36,32 @@ class _RecapPageState extends State<RecapPage> with TickerProviderStateMixin {
             fontWeight: FontWeight.bold,
           ),
         ),
+        leading: LogoutIcon(),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline, color: Colors.blue),
+            tooltip: 'Informasi',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Informasi'),
+                  content:
+                      const Text('Data keuntungan adalah total laba bersih'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
-          splashFactory: NoSplash.splashFactory, // ← tambahkan ini
+          splashFactory: NoSplash.splashFactory, // hilangkan efek splash
           overlayColor: WidgetStateProperty.all(
               Colors.transparent), // ← hilangkan warna overlay
           tabs: const [
@@ -69,6 +94,11 @@ class PenjualanTab extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.connectionState == ConnectionState.none) {
+          return const Center(
+              child: Text(
+                  'Tidak ada koneksi, pastikan Anda terhubung ke internet'));
         }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const Center(child: Text('Belum ada penjualan'));

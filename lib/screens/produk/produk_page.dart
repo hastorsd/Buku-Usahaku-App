@@ -5,6 +5,7 @@ import 'package:thesis_app/model/produk.dart';
 import 'package:thesis_app/screens/produk/detail_produk_page.dart';
 import 'package:thesis_app/screens/produk/tambah_produk.dart';
 import 'package:thesis_app/widgets/custom_appbar.dart';
+import 'package:thesis_app/widgets/logout_icon.dart';
 
 class ProdukPage extends StatefulWidget {
   const ProdukPage({super.key});

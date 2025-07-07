@@ -73,7 +73,7 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
       file.absolute.path,
       minWidth: 800,
       minHeight: 800,
-      quality: 70, // kamu bisa sesuaikan antara 0 - 100
+      quality: 70, // bisa disesuaikan antara 0 - 100
       format: CompressFormat.jpeg,
     );
     return result;
@@ -140,7 +140,7 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
       await widget.produkDatabase.createProduk(produk);
     }
 
-    if (mounted) Navigator.pop(context);
+    if (mounted) Navigator.pop(context, true); // biar data edit langsung muncul
   }
 
   @override
@@ -258,7 +258,7 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(isEdit ? 'Simpan Perubahan' : 'Tambah Produk',
+                    : Text(isEdit ? 'Simpan Perubahan' : 'Simpan Produk',
                         style: const TextStyle(color: Colors.white)),
               ),
             ),
@@ -282,8 +282,10 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
             keyboardType == TextInputType.number ? [ThousandsFormatter()] : [],
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: const TextStyle(color: Colors.grey), // Label color grey
           hintText:
               label == 'Harga Jual' || label == 'Harga Modal' ? 'Rp.' : '',
+          hintStyle: const TextStyle(color: Colors.grey), // Hint color grey
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),

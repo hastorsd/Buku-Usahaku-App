@@ -43,6 +43,22 @@ class PesananDatabase {
     await database.from('pesanan').delete().eq('id', pesanan.id!);
   }
 
+  // get pesanan by id
+  Future<Pesanan?> getPesananById(int id) async {
+    final userId = database.auth.currentUser!.id;
+
+    final result = await database
+        .from('pesanan')
+        .select()
+        .eq('id', id)
+        .eq('user_id', userId)
+        .maybeSingle(); // untuk ambil 1 data saja atau null kalau tidak ada
+
+    if (result == null) return null;
+
+    return Pesanan.fromMap(result);
+  }
+
   /* INI ADALAH FUNGSI UNTUK REKAP PENJUALAN PRODUK*/
 // Ambil total penjualan per produk
   Future<List<Map<String, dynamic>>> getRekapPenjualanPerProduk() async {
