@@ -59,7 +59,7 @@ Aplikasi ini dibuat menggunakan **Flutter**, sehingga dapat dijalankan di:
 
 ---
 
-## 📥 Cara Install Aplikasi (Pengguna Awam)
+## 📥 Cara Install Aplikasi (Khusus Pengguna Android)
 
 ### Android
 
@@ -70,8 +70,6 @@ Jika Anda mendapatkan file aplikasi dalam bentuk **APK**:
 3. Aktifkan izin **Instal dari sumber tidak dikenal** jika diminta.
 4. Tunggu hingga proses instalasi selesai.
 5. Aplikasi **Buku Usahaku** siap digunakan.
-
-> ⚠️ Jika Anda belum memiliki file APK, silakan hubungi pengembang aplikasi.
 
 ---
 
@@ -140,8 +138,7 @@ Data ditampilkan untuk membantu Anda memantau perkembangan usaha.
 
 ## 🔒 Lisensi & Hak Akses
 
-Aplikasi **Buku Usahaku** **BUKAN bersifat open source**.  
-Seluruh kode sumber dan aset aplikasi dilindungi hak cipta dan tidak diperkenankan untuk digunakan, disalin, atau didistribusikan tanpa izin.
+Seluruh kode sumber dan aset aplikasi akan dilindungi hak cipta dan tidak diperkenankan untuk digunakan, disalin, atau didistribusikan tanpa izin.
 
 ---
 
