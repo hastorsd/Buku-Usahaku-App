@@ -4,9 +4,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:thesis_app/auth/auth_gate.dart';
 import 'package:thesis_app/screens/splash/splash_screen.dart';
 
-const supabaseUrl = 'https://ypbanzykohokfcorbkom.supabase.co';
+const supabaseUrl = '';
 const supabaseKey =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwYmFuenlrb2hva2Zjb3Jia29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE4NTE2NzQsImV4cCI6MjA1NzQyNzY3NH0.8BnStl8byaE4rvYUu_AcZG0_qUYsqYbxsvQixOBWuEg';
+    '';
 
 Future<void> main() async {
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
